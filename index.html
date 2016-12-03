@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Learning 6502</title>
+    <link rel="stylesheet" href="styles/codemirror.css">
+    <script type="text/javascript" src="scripts/codemirror.js"></script>
+    <script type="text/javascript" src="scripts/6502.js"></script>
+    <script type="text/javascript" src="scripts/quizlib.js"></script>
+    <script type="text/javascript" src="scripts/main.js"></script>
+  </head>
+  <body>
+
+    <!--
+    Quizzes that
+    (1) for the existence of values in certain addresses,
+    (2) if objective is achieved under a certain number of opcodes,
+    (3) declaration of labels/constants? -- might require adapting the assembler,
+    (4) debug and fix a problem,
+    (5) fill-in-the-blank code to fix problem,
+    (6) students write a routine using a label and I swizzle a test that checks conditions before and after it is called,
+    (7) could also test to see if there is another js-based emulator that actually emulates NES instead of just the generic screen thingy
+
+    -->
+
+    <p>Based upon <a href="https://www.mdawson.net/asm6502/6502asm.php">mdawson</a>, <a href="http://mkaminsky11.github.io/codemirror-themes/">mkaminsky11</a>, and <a href="http://www.oxyron.de/html/opcodes02.html">Oxyron</a> examples.</p>
+    <p>Uses https://github.com/ALPSquid/quizlib for basic quizzes</p>
+
+    <div class="widget">
+      <div class="buttons">
+        <input type="button" value="Assemble" class="assembleButton" />
+        <input type="button" value="Run" class="runButton" />
+        <input type="button" value="Reset" class="resetButton" />
+        <input type="button" value="Hexdump" class="hexdumpButton" />
+        <input type="button" value="Disassemble" class="disassembleButton" />
+        <input type="button" value="Notes" class="notesButton" />
+      </div>
+
+      <textarea id="demotext" class="code">
+  LDA #$01
+  STA $0200
+  LDA #$05
+  STA $0201
+  LDA #$08
+  STA $0202
+      </textarea>
+
+      <canvas class="screen" width="160" height="160"></canvas>
+
+      <div class="debugger">
+        <input type="checkbox" class="debug" name="debug" />
+        <label for="debug">Debugger</label>
+        <div class="minidebugger"></div>
+        <div class="buttons">
+          <input type="button" value="Step" class="stepButton" />
+          <input type="button" value="Jump to..." class="gotoButton" />
+        </div>
+      </div>
+
+      <div class="monitorControls">
+        <label for="monitoring">Monitor</label>
+        <input type="checkbox" class="monitoring" name="monitoring" />
+
+        <label for="start">Start: $</label>
+        <input type="text" value="0" class="start" name="start" />
+        <label for="length">Length: $</label>
+        <input type="text" value="ff" class="length" name="length" />
+      </div>
+
+      <div class="monitor"><pre><code></code></pre></div>
+      <div class="messages"><pre><code></code></pre></div>
+
+      <div class="notes" style="display: none">
+        Notes:
+
+        Memory location $fe contains a new random byte on every instruction.
+        Memory location $ff contains the ascii code of the last key pressed.
+
+        Memory locations $200 to $5ff map to the screen pixels. Different values will
+        draw different colour pixels. The colours are:
+
+        $0: Black
+        $1: White
+        $2: Red
+        $3: Cyan
+        $4: Purple
+        $5: Green
+        $6: Blue
+        $7: Yellow
+        $8: Orange
+        $9: Brown
+        $a: Light red
+        $b: Dark grey
+        $c: Grey
+        $d: Light green
+        $e: Light blue
+        $f: Light grey
+        </div>
+
+    </div>
+
+    <!-- Quiz Results -->
+    <div id="quiz-result" class="card">
+        You Scored <span id="quiz-percent"></span>% - <span id="quiz-score"></span>/<span id="quiz-max-score"></span><br/>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz">
+        <!-- Question 1 -->
+        <div class="card quizlib-question">
+            <div class="quizlib-question-title">1. What is the answer to life, the universe and everything?</div>
+            <div class="quizlib-question-answers">
+                <input type="text" name="q1">
+            </div>
+        </div>
+        <!-- Question 2 -->
+        <div class="card quizlib-question">
+            <div class="quizlib-question-title">2. Your enemy's father...</div>
+            <div class="quizlib-question-answers">
+                <ul>
+                    <li><label><input type="radio" name="q2" value="a"> is a hamster</label></li>
+                    <li><label><input type="radio" name="q2" value="b"> smells of elderberries</label></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Question 3 -->
+        <div class="card quizlib-question">
+            <div class="quizlib-question-title">3. Which factors will contribute to the end of humanity as we know it?</div>
+            <div class="quizlib-question-answers">
+                <ul>
+                    <li><label><input type="checkbox" name="q3" value="a"> Global warming</label></li>
+                    <li><label><input type="checkbox" name="q3" value="b"> The release of Linux 4.1.15</label></li>
+                    <li><label><input type="checkbox" name="q3" value="c"> Cats</label></li>
+                    <li><label><input type="checkbox" name="q3" value="d"> Advancements in artificial intelligence</label></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Answer Button -->
+        <button type="button" onclick="showResults();">Check Answers</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="scripts/es5-shim.js"></script>
+    <script src="scripts/assembler.js"></script>
+
+  </body>
+</html>
